@@ -1,34 +1,33 @@
 import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
 import TableRow from '../components/TableRow';
-import CreateCustomerForm from '../components/CreateCustomerForm';
-import UpdateCustomerForm from '../components/UpdateCustomerForm';
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
 
 function Roles({ backendURL }) {
 
 
     const roleConfig = {
-        entityName: "Orders",
+        entityName: "JobRoles",
         fields: [
             { name: "JobName", label: "Job Name", type: "text" },
             { name: "pay", label: "Salary", type: "number"}
         ]     
     };
     // Set up a state variable `roles` to store and display the backend response
-    const [roles, setcustomers] = useState([]);
+    const [jobroles, setRoles] = useState([]);
 
     
 
     const getData = async function () {
         try {
             // Make a GET request to the backend
-            const response = await fetch(backendURL + '/Roles');
+            const response = await fetch(backendURL + '/JobRoles');
             
             // Convert the response into JSON format
-            const {roles} = await response.json();
-    
+            const {jobroles} = await response.json();
+            
             // Update the roles state with the response data
-            setcustomers(roles);
+            setRoles(jobroles);
             
             
         } catch (error) {
@@ -43,6 +42,8 @@ function Roles({ backendURL }) {
         getData();
     }, []);
 
+    const [updateID, setUpdateID] = useState("");
+
     return (
         <>
             <h1>Job Roles</h1>
@@ -50,7 +51,7 @@ function Roles({ backendURL }) {
             <table>
                 <thead>
                     <tr>
-                        {roles.length > 0 && Object.keys(roles[0]).map((header, index) => (
+                        {jobroles.length > 0 && Object.keys(jobroles[0]).map((header, index) => (
                             <th key={index}>{header}</th>
                         ))}
                         <th></th>
@@ -58,17 +59,38 @@ function Roles({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {roles.map((jobRole, index) => (
-                        <TableRow key={index} rowObject={jobRole} backendURL={backendURL} refreshcustomers={getData}/>
+                    {jobroles.map((jobRole, index) => (
+                        <TableRow key={index} rowObject={jobRole} backendURL={backendURL} refreshData={getData}/>
                     ))}
 
                 </tbody>
             </table>
+
             <DynamicCreateForm
                 config={roleConfig}
                 backendURL={backendURL}
                 refreshData={getData}
             />
+
+            <h2>Update Position</h2>
+            <div>
+                <label>Job ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Position</option>
+                    {jobroles.map((jobroles) => (
+                        <option key={jobroles.jobID} value={jobroles.jobID}>
+                            {jobroles.jobID} - {jobroles.jobName}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
+                config={roleConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+            />
+
                          
         </>
     );

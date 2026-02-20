@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
 import TableRow from '../components/TableRow';
-import CreateCustomerForm from '../components/CreateCustomerForm';
-import UpdateCustomerForm from '../components/UpdateCustomerForm';
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
 
 function OrderItems({ backendURL }) {
@@ -14,22 +13,22 @@ function OrderItems({ backendURL }) {
             { name: "quantity", label: "Quantity", type: "number"}
         ]     
     };
-    // Set up a state variable `items` to store and display the backend response
-    const [items, setcustomers] = useState([]);
-
-    console.log(backendURL);
+    // Set up a state variable `orderitems` to store and display the backend response
+    const [orderitems, setcustomers] = useState([]);
+    const [updateID, setUpdateID] = useState("");
+    
 
     const getData = async function () {
         try {
             // Make a GET request to the backend
-            const response = await fetch(backendURL + '/Items');
+            const response = await fetch(backendURL + '/OrderItems');
             
             // Convert the response into JSON format
-            const {items, homeworlds} = await response.json();
+            const {orderitems} = await response.json();
     
-            // Update the items state with the response data
-            setcustomers(items);
-            setHomeworlds(homeworlds);
+            // Update the orderitems state with the response data
+            setcustomers(orderitems);
+            
             
         } catch (error) {
           // If the API call fails, print the error to the console
@@ -50,7 +49,7 @@ function OrderItems({ backendURL }) {
             <table>
                 <thead>
                     <tr>
-                        {items.length > 0 && Object.keys(items[0]).map((header, index) => (
+                        {orderitems.length > 0 && Object.keys(orderitems[0]).map((header, index) => (
                             <th key={index}>{header}</th>
                         ))}
                         <th></th>
@@ -58,14 +57,33 @@ function OrderItems({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {items.map((item, index) => (
-                        <TableRow key={index} rowObject={item} backendURL={backendURL} refreshcustomers={getData}/>
+                    {orderitems.map((item, index) => (
+                        <TableRow key={index} rowObject={item} backendURL={backendURL} refreshData={getData}/>
                     ))}
 
                 </tbody>
             </table>
             
             <DynamicCreateForm
+                config={itemsConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+            />
+
+            <h2>Update Order Items</h2>
+            <div>
+                <label>Order ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Order</option>
+                    {orderitems.map((item) => (
+                        <option key={item["Order ID"]} value={item["Order ID"]}>
+                            {item["Order ID"]}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
                 config={itemsConfig}
                 backendURL={backendURL}
                 refreshData={getData}

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
 import TableRow from '../components/TableRow';
-import CreateCustomerForm from '../components/CreateCustomerForm';
-import UpdateCustomerForm from '../components/UpdateCustomerForm';
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
 
 function Products({ backendURL }) {
@@ -17,7 +16,7 @@ function Products({ backendURL }) {
 
     // Set up a state variable `products` to store and display the backend response
     const [products, setcustomers] = useState([]);
-
+    const [updateID, setUpdateID] = useState("");
     
 
     const getData = async function () {
@@ -30,7 +29,7 @@ function Products({ backendURL }) {
     
             // Update the products state with the response data
             setcustomers(products);
-            setHomeworlds(homeworlds);
+            
             
         } catch (error) {
           // If the API call fails, print the error to the console
@@ -60,7 +59,7 @@ function Products({ backendURL }) {
 
                 <tbody>
                     {products.map((product, index) => (
-                        <TableRow key={index} rowObject={product} backendURL={backendURL} refreshcustomers={getData}/>
+                        <TableRow key={index} rowObject={product} backendURL={backendURL} refreshData={getData}/>
                     ))}
 
                 </tbody>
@@ -70,7 +69,25 @@ function Products({ backendURL }) {
                 backendURL={backendURL}
                 refreshData={getData}
             />
-                         
+
+            <h2>Update Product</h2>
+            <div>
+                <label>Product ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Product</option>
+                    {products.map((product) => (
+                        <option key={product.productID} value={product.productID}>
+                            {product.productID} - {product.productName}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
+                config={productConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+            />           
         </>
     );
 
