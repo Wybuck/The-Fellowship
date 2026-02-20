@@ -68,11 +68,20 @@ function Customers({ backendURL }) {
 
                 <tbody>
                     {customers.map((customer) => (
-                        <TableRow key={customer["Customer ID"]} rowObject={customer} backendURL={backendURL} refreshData={getData}/>
+                        <TableRow 
+                            key={customer["Customer ID"]} 
+                            rowObject={customer} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Customers" 
+                            primaryKey={["Customer ID"]}
+                        />
                     ))}
 
                 </tbody>
             </table>
+
+            <p>Be careful Deleting here, it can be dangerous, and lead to other pages being effected! (Orders)</p>
 
             <DynamicCreateForm
                 config={customerCreateConfig}
@@ -97,6 +106,7 @@ function Customers({ backendURL }) {
                 config={customerCreateConfig}
                 backendURL={backendURL}
                 refreshData={getData}
+                primaryKey={["customerID"]}
             />
             
 

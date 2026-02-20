@@ -9,7 +9,7 @@ function Roles({ backendURL }) {
     const roleConfig = {
         entityName: "JobRoles",
         fields: [
-            { name: "JobName", label: "Job Name", type: "text" },
+            { name: "jobName", label: "Job Name", type: "text" },
             { name: "pay", label: "Salary", type: "number"}
         ]     
     };
@@ -28,7 +28,7 @@ function Roles({ backendURL }) {
             
             // Update the roles state with the response data
             setRoles(jobroles);
-            
+            console.log(jobroles);
             
         } catch (error) {
           // If the API call fails, print the error to the console
@@ -59,8 +59,15 @@ function Roles({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {jobroles.map((jobRole, index) => (
-                        <TableRow key={index} rowObject={jobRole} backendURL={backendURL} refreshData={getData}/>
+                    {jobroles.map((jobRole) => (
+                        <TableRow 
+                            key={jobroles["Job ID"]} 
+                            rowObject={jobRole} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="JobRoles" 
+                            primaryKey={["Job ID"]}
+                        />
                     ))}
 
                 </tbody>
@@ -78,8 +85,8 @@ function Roles({ backendURL }) {
                 <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
                     <option value="">Select Position</option>
                     {jobroles.map((jobroles) => (
-                        <option key={jobroles.jobID} value={jobroles.jobID}>
-                            {jobroles.jobID} - {jobroles.jobName}
+                        <option key={jobroles["Job ID"]} value={jobroles["Job ID"]}>
+                            {jobroles["Job ID"]} - {jobroles["Job Name"]}
                         </option>
                     ))}
                 </select>
@@ -89,6 +96,7 @@ function Roles({ backendURL }) {
                 config={roleConfig}
                 backendURL={backendURL}
                 refreshData={getData}
+                primaryKey={["jobID"]}
             />
 
                          

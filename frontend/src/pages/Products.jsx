@@ -10,7 +10,8 @@ function Products({ backendURL }) {
         fields: [
             { name: "productName", label: "Product Name", type: "text" },
             { name: "productPrice", label: "Price", type: "number" },
-            { name: "sale", label: "Sale", type: "number"}
+            { name: "sale", label: "Sale", type: "number"},
+            { name: "categoryName", label: "Category", type: "text"}
         ]     
     };
 
@@ -58,8 +59,15 @@ function Products({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {products.map((product, index) => (
-                        <TableRow key={index} rowObject={product} backendURL={backendURL} refreshData={getData}/>
+                    {products.map((product) => (
+                        <TableRow 
+                            key={product["Product ID"]} 
+                            rowObject={product} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Products" 
+                            primaryKey={["Product ID"]}
+                        />
                     ))}
 
                 </tbody>
@@ -76,8 +84,8 @@ function Products({ backendURL }) {
                 <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
                     <option value="">Select Product</option>
                     {products.map((product) => (
-                        <option key={product.productID} value={product.productID}>
-                            {product.productID} - {product.productName}
+                        <option key={product["Product ID"]} value={product["Product ID"]}>
+                            {product["Product ID"]} - {product["Product Name"]}
                         </option>
                     ))}
                 </select>
@@ -87,6 +95,7 @@ function Products({ backendURL }) {
                 config={productConfig}
                 backendURL={backendURL}
                 refreshData={getData}
+                primaryKey={["productID"]}
             />           
         </>
     );

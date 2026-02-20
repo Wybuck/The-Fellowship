@@ -1,49 +1,37 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';
 import TableRow from '../components/TableRow';
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
 
 function OrderItems({ backendURL }) {
-
-
     const itemsConfig = {
         entityName: "OrderItems",
         fields: [
+            { name: "orderID", label: "Order ID", type: "number"},
             { name: "productID", label: "Product ID", type: "number"},
             { name: "quantity", label: "Quantity", type: "number"}
         ]     
     };
-    // Set up a state variable `orderitems` to store and display the backend response
-    const [orderitems, setcustomers] = useState([]);
-    const [updateID, setUpdateID] = useState("");
-    
+
+    const [orderitems, setOrderItems] = useState([]);
+    const [updateKeys, setUpdateKeys] = useState({ orderID: "", productID: "" });
 
     const getData = async function () {
         try {
-            // Make a GET request to the backend
-            const response = await fetch(backendURL + '/OrderItems');
-            
-            // Convert the response into JSON format
-            const {orderitems} = await response.json();
-    
-            // Update the orderitems state with the response data
-            setcustomers(orderitems);
-            
-            
+            const response = await fetch(`${backendURL}/OrderItems`);
+            const { orderitems } = await response.json();
+            setOrderItems(orderitems);
         } catch (error) {
-          // If the API call fails, print the error to the console
-          console.log(error);
+            console.log(error);
         }
-
     };
 
-    // Load table on page load
     useEffect(() => {
         getData();
     }, []);
 
     return (
-        <>
+        <> 
             <h1>Order Items</h1>
 
             <table>
@@ -57,12 +45,19 @@ function OrderItems({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {orderitems.map((item, index) => (
-                        <TableRow key={index} rowObject={item} backendURL={backendURL} refreshData={getData}/>
+                    {orderitems.map((item) => (
+                        <TableRow 
+                            key={`${item["Order ID"]}-${item["Product ID"]}`} 
+                            rowObject={item} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="OrderItems" 
+                            primaryKey={["Order ID", "Product ID"]}
+                        />
                     ))}
-
                 </tbody>
             </table>
+            <p> You Cannot update the Order ID or product ID, only the Quantity</p>
             
             <DynamicCreateForm
                 config={itemsConfig}
@@ -70,25 +65,39 @@ function OrderItems({ backendURL }) {
                 refreshData={getData}
             />
 
-            <h2>Update Order Items</h2>
+            <h2>Update Order Item</h2>
             <div>
-                <label>Order ID: </label>
-                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
-                    <option value="">Select Order</option>
+                <label>Order Item: </label>
+                <select
+                    value={`${updateKeys.orderID}-${updateKeys.productID}`}
+                    onChange={(e) => {
+                        const [orderID, productID] = e.target.value.split("-");
+                        setUpdateKeys({ orderID, productID });
+                    }}
+                >
+                    <option value="">Select Order Item</option>
                     {orderitems.map((item) => (
-                        <option key={item["Order ID"]} value={item["Order ID"]}>
-                            {item["Order ID"]}
+                        <option
+                            key={`${item["Order ID"]}-${item["Product ID"]}`}
+                            value={`${item["Order ID"]}-${item["Product ID"]}`}
+                        >
+                            {item["Order ID"]} - {item["Product ID"]}
                         </option>
                     ))}
                 </select>
             </div> 
-            <DynamicUpdateForm
-                id={updateID}
-                config={itemsConfig}
-                backendURL={backendURL}
-                refreshData={getData}
-            />             
+
+            
+                <DynamicUpdateForm
+                    id={updateKeys} 
+                    config={itemsConfig}
+                    backendURL={backendURL}
+                    refreshData={getData}
+                    primaryKey={["orderID", "productID"]} 
+                />
+                        
         </>
     );
+}
 
-} export default OrderItems;
+export default OrderItems;

@@ -32,7 +32,7 @@ const DynamicForm = ({ config, backendURL, refreshData }) => {
           <input
             type={field.type}
             name={field.name}
-            onChange={handleChange}
+            onChange={handleChange} required
           />
         </div>
       ))}

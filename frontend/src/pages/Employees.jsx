@@ -13,7 +13,7 @@ function Employees({ backendURL }) {
             { name: "firstName", label: "First Name", type: "text" },
             { name: "lastName", label: "Last Name", type: "text" },
             { name: "startDate", label: "Start Date", type: "date" },
-            { name: 'jobRole', label: 'Job Role', type:'number'}
+            { name: 'jobID', label: 'Job Role', type:'number'}
         ]
     };
     // Set up a state variable `employees` to store and display the backend response
@@ -61,11 +61,20 @@ function Employees({ backendURL }) {
 
                 <tbody>
                     {employees.map((employee) => (
-                        <TableRow key={employee["Employee ID"]} rowObject={employee} backendURL={backendURL} refreshemployees={getData}/>
+                        <TableRow 
+                            key={employee["Employee ID"]} 
+                            rowObject={employee} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Employees" 
+                            primaryKey={["Employee ID"]}
+                        />
                     ))}
 
                 </tbody>
             </table>
+
+            <p>Be careful Deleting here, it can be dangerous, and lead to other pages being effected! (Orders)</p>
             <DynamicCreateForm
                 config={employeeConfig}
                 backendURL={backendURL}
@@ -89,6 +98,7 @@ function Employees({ backendURL }) {
                 config={employeeConfig}
                 backendURL={backendURL}
                 refreshData={getData}
+                primaryKey={["employeeID"]}
             />
                         
         </>

@@ -1,7 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const DynamicForm = ({ config, backendURL, refreshData }) => {
+const DynamicUpdateForm = ({
+  id,
+  config,
+  backendURL,
+  refreshData,
+  primaryKey
+}) => {
   const [formData, setFormData] = useState({});
+
+  // Build URL for single OR composite key
+  const buildURL = () => {
+    if (!id) return "";
+
+    // Composite key (id must be object)
+    if (primaryKey && primaryKey.length > 1) {
+      if (typeof id !== "object") {
+        console.error("Composite key requires id to be an object");
+        return "";
+      }
+
+      const keyPath = primaryKey.map((key) => id[key]).join("/");
+      return `${backendURL}/${config.entityName}/${keyPath}`;
+    }
+
+    // Single key
+    return `${backendURL}/${config.entityName}/${id}`;
+  };
+
+  // Fetch existing record to prefill form
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(buildURL());
+        const data = await response.json();
+
+        const mappedData = {};
+        config.fields.forEach((field) => {
+          mappedData[field.name] = data[field.name] ?? "";
+        });
+
+        setFormData(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch record:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     setFormData({
@@ -13,18 +61,24 @@ const DynamicForm = ({ config, backendURL, refreshData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch(`${backendURL}/${config.entityName}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+    try {
+      await fetch(buildURL(), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-    refreshData();
+      refreshData();
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
+
+  if (!id) return null;
 
   return (
     <form onSubmit={handleSubmit}>
-      
+      <h2>Update {config.entityName}</h2>
 
       {config.fields.map((field) => (
         <div key={field.name}>
@@ -32,14 +86,16 @@ const DynamicForm = ({ config, backendURL, refreshData }) => {
           <input
             type={field.type}
             name={field.name}
+            value={formData[field.name] || ""}
             onChange={handleChange}
+            required
           />
         </div>
       ))}
 
-      <button type="submit">Submit</button>
+      <button type="submit">Update</button>
     </form>
   );
 };
 
-export default DynamicForm;
+export default DynamicUpdateForm;

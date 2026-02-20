@@ -13,6 +13,7 @@ function Orders({ backendURL }) {
         fields: [
             { name: "orderTotal", label: "Order Total", type: "float" },
             { name: "employeeID", label: "Employee ID", type: "number"},
+            { name: "customerID", label: "Customer ID", type: "number"},
             { name: "orderDate", label: "Order Date", type: "date" }
         ]     
     };
@@ -57,7 +58,14 @@ function Orders({ backendURL }) {
 
                 <tbody>
                     {orders.map((order) => (
-                        <TableRow key={order["Order ID"]} rowObject={order} backendURL={backendURL} refreshData={getData}/>
+                        <TableRow 
+                            key={order["Order ID"]} 
+                            rowObject={order} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Orders" 
+                            primaryKey={["Order ID"]}
+                        />
                     ))}
 
                 </tbody>
@@ -85,6 +93,7 @@ function Orders({ backendURL }) {
                 config={orderConfig}
                 backendURL={backendURL}
                 refreshData={getData}
+                primaryKey={["orderID"]}
             />
                            
         </>
