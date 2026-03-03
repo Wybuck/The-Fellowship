@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
 import DynamicCreateForm from "../components/DynamicCreateForm";
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
+import ResetForm from "../components/ResetForm"
 
 function Roles({ backendURL }) {
 
@@ -13,7 +14,7 @@ function Roles({ backendURL }) {
             { name: "pay", label: "Salary", type: "number"}
         ]     
     };
-    // Set up a state variable `roles` to store and display the backend response
+    
     const [jobroles, setRoles] = useState([]);
 
     
@@ -99,7 +100,13 @@ function Roles({ backendURL }) {
                 primaryKey={["jobID"]}
             />
 
-                         
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="JobRoles" 
+            />                 
         </>
     );
 

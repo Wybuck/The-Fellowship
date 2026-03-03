@@ -21,7 +21,7 @@ function App() {
 
     return (
         <>
-            <Navigation />
+            <Navigation/>
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/Customers" element={<Customers backendURL={backendURL} />} />
@@ -36,3 +36,8 @@ function App() {
     );
 
 } export default App;
+
+//Citation
+//Date:2/11/26
+//Based on:
+// https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419

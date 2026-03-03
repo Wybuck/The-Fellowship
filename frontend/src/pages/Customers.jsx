@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
 
 
 import DynamicCreateForm from "../components/DynamicCreateForm";
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
+import ResetForm from "../components/ResetForm"
 
 
 function Customers({ backendURL }) {
 
-    // Set up a state variable `customers` to store and display the backend response
+    
     const [customers, setcustomers] = useState([]);
     const [updateID, setUpdateID] = useState("");
     
@@ -39,7 +40,7 @@ function Customers({ backendURL }) {
             
             
         } catch (error) {
-          // If the API call fails, print the error to the console
+          
           console.log(error);
         }
 
@@ -108,7 +109,14 @@ function Customers({ backendURL }) {
                 refreshData={getData}
                 primaryKey={["customerID"]}
             />
-            
+
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Customers" 
+            />     
 
                     
         </>

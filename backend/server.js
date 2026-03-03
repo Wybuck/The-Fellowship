@@ -729,9 +729,28 @@ app.delete('/OrderItems/:orderID/:productID', async (req, res) => {
     }
 });
 
+// Reset Route
+app.post('/Reset', async (req, res) => {
+    console.log("success in calling")
+    try {
+        await db.query("CALL sp_reset_database;");
+        
+
+        res.status(200).json({ message: "All data has been reset!"});
+    } catch (error) {
+        console.error("Error resetting:", error);
+        res.status(500).send("An error occurred while resetting the database.");
+    }
+});
+
 // ########################################
 // ########## LISTENER
 
 app.listen(PORT, function () {
     console.log('Express started on http://classwork.engr.oregonstate.edu:' + PORT + '; press Ctrl-C to terminate.');
 });
+
+//Citation
+//Date:2/11/26
+//Based on:
+// https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419

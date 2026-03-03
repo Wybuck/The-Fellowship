@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 function Orders({ backendURL }) {
 
-    // Set up a state variable `orders` to store and display the backend response
+    
     const [orders, setorders] = useState([]);
     const [updateID, setUpdateID] = useState("");
     const orderConfig = {
@@ -95,6 +96,14 @@ function Orders({ backendURL }) {
                 refreshData={getData}
                 primaryKey={["orderID"]}
             />
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Orders" 
+            />
+            
                            
         </>
     );

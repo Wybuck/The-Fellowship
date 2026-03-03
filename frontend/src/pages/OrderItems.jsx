@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import TableRow from '../components/TableRow';
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 function OrderItems({ backendURL }) {
     const itemsConfig = {
@@ -95,7 +96,13 @@ function OrderItems({ backendURL }) {
                     refreshData={getData}
                     primaryKey={["orderID", "productID"]} 
                 />
-                        
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="OrderItems" 
+            />       
         </>
     );
 }

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 
 function Employees({ backendURL }) {
-    //Setting up class to hand to form
+    //Setting up class to hand to update/create forms
     const employeeConfig = {
         entityName: "Employees",
         idField: "employeeID",
@@ -16,7 +17,7 @@ function Employees({ backendURL }) {
             { name: 'jobID', label: 'Job Role', type:'number'}
         ]
     };
-    // Set up a state variable `employees` to store and display the backend response
+    
     const [employees, setemployees] = useState([]);
     const [updateID, setUpdateID] = useState("");
 
@@ -34,7 +35,7 @@ function Employees({ backendURL }) {
             
             
         } catch (error) {
-          // If the API call fails, print the error to the console
+          
           console.log(error);
         }
 
@@ -100,7 +101,14 @@ function Employees({ backendURL }) {
                 refreshData={getData}
                 primaryKey={["employeeID"]}
             />
-                        
+
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Employees" 
+            />         
         </>
     );
 

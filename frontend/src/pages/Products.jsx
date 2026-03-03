@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';  // Importing useState for managing
 import TableRow from '../components/TableRow';
 import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 function Products({ backendURL }) {
     //
@@ -96,7 +97,14 @@ function Products({ backendURL }) {
                 backendURL={backendURL}
                 refreshData={getData}
                 primaryKey={["productID"]}
-            />           
+            />   
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Products" 
+            />      
         </>
     );
 

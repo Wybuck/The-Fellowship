@@ -99,3 +99,9 @@ const DynamicUpdateForm = ({
 };
 
 export default DynamicUpdateForm;
+
+//Citation for AI use of tools
+//Date: 2/18/26
+// A brief description of prompts: I asked for an updated version of the DynamicCreateForm that would instead update a row and could potentially use a composite key to properly update.
+// This was a long chain of prompts, as i was trying to understand why it was making the changes it made and it led to a deeper understanding of JavaScript objects.
+//AI Source URL: https://chatgpt.com/
