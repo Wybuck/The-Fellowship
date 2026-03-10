@@ -237,7 +237,7 @@ app.post('/Customers', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Customers (firstName, lastName, homeTown) VALUES (?, ?, ?)',
+        'CALL sp_create_customer(?, ?, ?)',
         [firstName, lastName, homeTown]
     );
     // Return the inserted row info
@@ -265,7 +265,7 @@ app.post('/JobRoles', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO JobRoles (jobName, pay) VALUES (?, ?)',
+        'CALL sp_create_jobRole(?, ?)',
         [jobName, pay]
     );
     // Return the inserted row info
@@ -291,7 +291,7 @@ app.post('/Employees', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Employees (firstName, lastName, startDate, jobID) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_employee(?, ?, ?, ?);',
         [firstName, lastName, startDate, jobID]
     );
     // Return the inserted row info
@@ -317,7 +317,7 @@ app.post('/Products', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Products (productName, productPrice, sale, categoryName) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_product(?, ?, ?, ?)',
         [productName, productPrice, sale, categoryName]
     );
     // Return the inserted row info
@@ -343,7 +343,7 @@ app.post('/Orders', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Orders (employeeID, customerID, orderTotal, orderDate) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_order(?, ?, ?, ?);',
         [employeeID, customerID, orderTotal, orderDate]
     );
     // Return the inserted row info
@@ -369,7 +369,7 @@ app.post('/OrderItems', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO OrderItems (orderID, productID, quantity) VALUES (?, ?, ?)',
+        'CALL sp_create_orderItem(?, ?, ?)',
         [orderID, productID, quantity]
     );
     // Return the inserted row info
@@ -400,7 +400,7 @@ app.put('/Customers/:customerID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Customers SET firstName = ?, lastName = ?, homeTown = ? WHERE customerID = ?',
+            'CALL sp_update_customer(?, ?, ?, ?)',
             [firstName, lastName, homeTown, customerID]
         );
 
@@ -436,7 +436,7 @@ app.put('/JobRoles/:jobID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE JobRoles SET jobName = ?, pay = ? WHERE jobID = ?',
+            'CALL sp_update_jobRole(?, ?, ?)',
             [jobName, pay, jobID]
         );
 
@@ -472,7 +472,7 @@ app.put('/Employees/:employeeID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Employees SET firstName = ?, lastName = ?, startDate = ?, jobID = ? WHERE employeeID = ?',
+            'CALL sp_update_employee(?, ?, ?, ?, ?)',
             [firstName, lastName, startDate, jobID, employeeID]
         );
 
@@ -508,7 +508,7 @@ app.put('/Products/:productID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Products SET productName = ?, productPrice = ?, sale = ?, categoryName = ? WHERE productID = ?',
+            'CALL sp_update_product(?, ?, ?, ?, ?);',
             [productName, productPrice, sale, categoryName, productID]
         );
 
@@ -544,7 +544,7 @@ app.put('/Orders/:orderID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Orders SET employeeID = ?, customerID = ?, orderTotal = ?, orderDate = ? WHERE orderID = ?',
+            'CALL sp_update_order(?, ?, ?, ?, ?)',
             [employeeID, customerID, orderTotal, orderDate, orderID]
         );
 
@@ -581,7 +581,7 @@ app.put('/OrderItems/:orderID/:productID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE OrderItems SET quantity = ? WHERE orderID = ? AND productID = ?',
+            'CALL sp_update_orderItem(?, ?, ?)',
             [quantity, orderID, productID]
         );
 
@@ -609,7 +609,7 @@ app.delete('/Customers/:customerID', async (req, res) => {
     try {
         const customerID = req.params.customerID;
 
-        const query = 'DELETE FROM Customers WHERE customerID = ?';
+        const query = 'CALL sp_delete_customer(?)';
         const [result] = await db.query(query, [customerID]);
 
         if (result.affectedRows === 0) {
@@ -630,7 +630,7 @@ app.delete('/JobRoles/:jobID', async (req, res) => {
     try {
         const jobID = req.params.jobID;
 
-        const query = 'DELETE FROM JobRoles WHERE jobID = ?';
+        const query = 'CALL sp_delete_jobRole(?)';
         const [result] = await db.query(query, [jobID]);
 
         if (result.affectedRows === 0) {
@@ -651,7 +651,7 @@ app.delete('/Employees/:employeeID', async (req, res) => {
     try {
         const employeeID = req.params.employeeID;
 
-        const query = 'DELETE FROM Employees WHERE employeeID = ?';
+        const query = 'CALL sp_delete_employee(?)';
         const [result] = await db.query(query, [employeeID]);
 
         if (result.affectedRows === 0) {
@@ -672,7 +672,7 @@ app.delete('/Products/:productID', async (req, res) => {
     try {
         const productID = req.params.productID;
 
-        const query = 'DELETE FROM Products WHERE productID = ?';
+        const query = 'CALL sp_delete_product(?)';
         const [result] = await db.query(query, [productID]);
 
         if (result.affectedRows === 0) {
@@ -693,7 +693,7 @@ app.delete('/Orders/:orderID', async (req, res) => {
     try {
         const orderID = req.params.orderID;
 
-        const query = 'DELETE FROM Orders WHERE orderID = ?';
+        const query = 'CALL sp_delete_order(?);';
         const [result] = await db.query(query, [orderID]);
 
         if (result.affectedRows === 0) {
@@ -714,7 +714,7 @@ app.delete('/OrderItems/:orderID/:productID', async (req, res) => {
     try {
         const {orderID, productID} = req.params;
 
-        const query = 'DELETE FROM OrderItems WHERE orderID = ? AND productID = ?';
+        const query = 'CALL sp_delete_orderItem(?, ?)';
         const [result] = await db.query(query, [orderID, productID]);
 
         if (result.affectedRows === 0) {

@@ -75,7 +75,7 @@ function Employees({ backendURL }) {
                 </tbody>
             </table>
 
-            <p>Be careful Deleting here, it can be dangerous, and lead to other pages being effected! (Orders)</p>
+            <p>If an employee is in the orders table, you will not be able to delete them!</p>
             <DynamicCreateForm
                 config={employeeConfig}
                 backendURL={backendURL}
