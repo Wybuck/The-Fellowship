@@ -1,13 +1,20 @@
-import DeleteCustomerForm from './DeleteCustomerForm';
+import DeleteEntityForm from './DeleteEntityForm';
 
-const TableRow = ({ rowObject, backendURL, refreshcustomers }) => {
+const TableRow = ({ rowObject, backendURL, refreshData, entityName, primaryKey }) => {
     return (
         <tr>
             {Object.values(rowObject).map((value, index) => (
                 <td key={index}>{value}</td>
             ))}
-            
-            <DeleteCustomerForm rowObject={rowObject} backendURL={backendURL} refreshcustomers={refreshcustomers} />
+
+            {/* Pass entityName and primaryKey to DeleteEntityForm */}
+            <DeleteEntityForm 
+                rowObject={rowObject} 
+                backendURL={backendURL} 
+                refreshData={refreshData} 
+                entityName={entityName} 
+                primaryKey={primaryKey} 
+            />
         </tr>
     );
 };

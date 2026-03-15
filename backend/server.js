@@ -10,21 +10,23 @@ const app = express();
 
 // Middleware
 const cors = require('cors');
-const e = require('express');
 app.use(cors({ credentials: true, origin: "*" }));
 app.use(express.json()); // this is needed for post requests
 
 
-const PORT = 33018;
+const PORT = 33060;
 
 // ########################################
 // ########## ROUTE HANDLERS
-
-// Customer READ ROUTES
+app.use((req,res,next)=>{
+    console.log("Incoming request:", req.method, req.url);
+    next();
+});
+// READ ROUTES
 app.get('/Customers', async (req, res) => {
     try {
         // Create and execute our queries
-        const [customers] = await db.query('SELECT * from Customers;');
+        const [customers] = await db.query('SELECT customerID AS "Customer ID", firstName AS "First Name", lastName AS "Last Name", homeTown AS "Home Town" from Customers;');
         res.status(200).json({customers});  // Send the results to the frontend
 
     } catch (error) {
@@ -58,8 +60,8 @@ app.get('/Customers/:customerID', async (req, res) => {
 app.get('/JobRoles', async (req, res) => {
     try {
         // Create and execute our queries
-        const [jobroles] = await db.query('SELECT * from JobRoles;');
-        res.status(200).json({jobroles});  // Send the results to the frontend
+        const [jobroles] = await db.query('SELECT j.jobID AS "Job ID", j.jobName AS "Job Name", j.pay as "Salary" from JobRoles j;');
+        res.status(200).json({ jobroles });  // Send the results to the frontend
 
     } catch (error) {
         console.error("Error executing queries:", error);
@@ -92,7 +94,7 @@ app.get('/JobRoles/:jobID', async (req, res) => {
 app.get('/Employees', async (req, res) => {
     try {
         // Create and execute our queries
-        const [employees] = await db.query('SELECT e.firstName, e.lastName, e.startDate, j.jobName FROM Employees e LEFT JOIN JobRoles j ON e.jobID = j.jobID');
+        const [employees] = await db.query('SELECT e.employeeID AS "Employee ID", e.firstName AS "First Name", e.lastName AS "Last Name", e.startDate AS "Start Date", e.jobID AS "Role ID", j.jobName AS "Role" FROM Employees e LEFT JOIN JobRoles j ON e.jobID = j.jobID');
         res.status(200).json({employees});  // Send the results to the frontend
 
     } catch (error) {
@@ -126,7 +128,7 @@ app.get('/Employees/:employeeID', async (req, res) => {
 app.get('/Products', async (req, res) => {
     try {
         // Create and execute our queries
-        const [products] = await db.query('SELECT * from Products;');
+        const [products] = await db.query('SELECT productID as "Product ID", productName AS "Product Name", productPrice AS "Product Price", sale AS "Sale", categoryName as "Category" from Products;');
         res.status(200).json({products});  // Send the results to the frontend
 
     } catch (error) {
@@ -160,7 +162,7 @@ app.get('/Products/:productID', async (req, res) => {
 app.get('/Orders', async (req, res) => {
     try {
         // Create and execute our queries
-        const [orders] = await db.query('SELECT * from Orders;');
+        const [orders] = await db.query('SELECT o.orderID as "Order ID", o.employeeID AS "Employee ID", e.firstName as "Employee Name", o.customerID AS "Customer ID", c.firstName AS "Customer Name", o.orderTotal AS "Order Total", o.orderDate AS "Order Date" from Orders o LEFT JOIN Employees e ON o.employeeID = e.employeeID LEFT JOIN Customers c on o.customerID = c.customerID;');
         res.status(200).json({orders});  // Send the results to the frontend
 
     } catch (error) {
@@ -194,7 +196,7 @@ app.get('/Orders/:orderID', async (req, res) => {
 app.get('/OrderItems', async (req, res) => {
     try {
         // Create and execute our queries
-        const [orderitems] = await db.query('SELECT * from OrderItems;');
+        const [orderitems] = await db.query('SELECT o.orderID AS "Order ID", o.productID AS "Product ID", p.productName AS "Product Name", o.quantity AS "Quantity" from OrderItems o LEFT JOIN Products p ON o.productID = p.productID;');
         res.status(200).json({orderitems});  // Send the results to the frontend
 
     } catch (error) {
@@ -223,6 +225,8 @@ app.get('/OrderItems/:orderID', async (req, res) => {
 
 });
 
+
+
 // Customer CREATE ROUTES
 
 app.post('/Customers', async (req, res) => {
@@ -233,7 +237,7 @@ app.post('/Customers', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Customers (firstName, lastName, homeTown) VALUES (?, ?, ?)',
+        'CALL sp_create_customer(?, ?, ?)',
         [firstName, lastName, homeTown]
     );
     // Return the inserted row info
@@ -252,14 +256,16 @@ app.post('/Customers', async (req, res) => {
 // JobRole CREATE ROUTE
 
 app.post('/JobRoles', async (req, res) => {
+    console.log("Incoming JobRole POST:", req.body);
     try{
+        
         const {jobName, pay} = req.body;
         if (!jobName || !pay) {
            return res.status(400).json({ error: 'Missing required field'});
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO JobRoles (jobName, pay) VALUES (?, ?)',
+        'CALL sp_create_jobRole(?, ?)',
         [jobName, pay]
     );
     // Return the inserted row info
@@ -285,7 +291,7 @@ app.post('/Employees', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Employees (firstName, lastName, startDate, jobID) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_employee(?, ?, ?, ?);',
         [firstName, lastName, startDate, jobID]
     );
     // Return the inserted row info
@@ -311,7 +317,7 @@ app.post('/Products', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Products (productName, productPrice, sale, categoryName) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_product(?, ?, ?, ?)',
         [productName, productPrice, sale, categoryName]
     );
     // Return the inserted row info
@@ -337,7 +343,7 @@ app.post('/Orders', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO Orders (employeeID, customerID, orderTotal, orderDate) VALUES (?, ?, ?, ?)',
+        'CALL sp_create_order(?, ?, ?, ?);',
         [employeeID, customerID, orderTotal, orderDate]
     );
     // Return the inserted row info
@@ -363,7 +369,7 @@ app.post('/OrderItems', async (req, res) => {
         }
     // Insert into the database
         const [result] = await db.query(
-        'INSERT INTO OrderItems (orderID, productID, quantity) VALUES (?, ?, ?)',
+        'CALL sp_create_orderItem(?, ?, ?)',
         [orderID, productID, quantity]
     );
     // Return the inserted row info
@@ -382,6 +388,7 @@ app.post('/OrderItems', async (req, res) => {
 // Customer UPDATE ROUTE
 
 app.put('/Customers/:customerID', async (req, res) => {
+    console.log("success in calling")
     try {
         const customerID = req.params.customerID;
         const { firstName, lastName, homeTown } = req.body;
@@ -393,7 +400,7 @@ app.put('/Customers/:customerID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Customers SET firstName = ?, lastName = ?, homeTown = ? WHERE customerID = ?',
+            'CALL sp_update_customer(?, ?, ?, ?)',
             [firstName, lastName, homeTown, customerID]
         );
 
@@ -429,7 +436,7 @@ app.put('/JobRoles/:jobID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE JobRoles SET jobName = ?, pay = ? WHERE jobID = ?',
+            'CALL sp_update_jobRole(?, ?, ?)',
             [jobName, pay, jobID]
         );
 
@@ -465,7 +472,7 @@ app.put('/Employees/:employeeID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Employees SET firstName = ?, lastName = ?, startDate = ?, jobID = ? WHERE employeeID = ?',
+            'CALL sp_update_employee(?, ?, ?, ?, ?)',
             [firstName, lastName, startDate, jobID, employeeID]
         );
 
@@ -501,7 +508,7 @@ app.put('/Products/:productID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Products SET productName = ?, productPrice = ?, sale = ?, categoryName = ? WHERE productID = ?',
+            'CALL sp_update_product(?, ?, ?, ?, ?);',
             [productName, productPrice, sale, categoryName, productID]
         );
 
@@ -537,7 +544,7 @@ app.put('/Orders/:orderID', async (req, res) => {
 
         // Update the record in the database
         const [result] = await db.query(
-            'UPDATE Orders SET employeeID = ?, customerID = ?, orderTotal = ?, orderDate = ? WHERE orderID = ?',
+            'CALL sp_update_order(?, ?, ?, ?, ?)',
             [employeeID, customerID, orderTotal, orderDate, orderID]
         );
 
@@ -559,13 +566,50 @@ app.put('/Orders/:orderID', async (req, res) => {
     }
 });
 
+// OrderItems PUT Route
+
+app.put('/OrderItems/:orderID/:productID', async (req, res) => {
+    try {
+        const orderID = req.params.orderID;
+        const productID = req.params.productID;
+        const { quantity } = req.body;
+
+        // Validate required fields
+        if (!orderID || !productID || !quantity) {
+            return res.status(400).json({ error: 'Missing required field(s)' });
+        }
+
+        // Update the record in the database
+        const [result] = await db.query(
+            'CALL sp_update_orderItem(?, ?, ?)',
+            [quantity, orderID, productID]
+        );
+
+        // Check if any row was actually updated
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Return the updated order
+        const [updatedOrder] = await db.query(
+            'SELECT * FROM OrderItems WHERE orderID = ? AND productID = ?',
+            [orderID, productID]
+        );
+
+        res.status(200).json(updatedOrder[0]);
+    } catch (error) {
+        console.error("Error updating order:", error);
+        res.status(500).send("An error occurred while updating the order.");
+    }
+});
+
 // Customer DELETE ROUTE
 
 app.delete('/Customers/:customerID', async (req, res) => {
     try {
         const customerID = req.params.customerID;
 
-        const query = 'DELETE FROM Customers WHERE customerID = ?';
+        const query = 'CALL sp_delete_customer(?)';
         const [result] = await db.query(query, [customerID]);
 
         if (result.affectedRows === 0) {
@@ -586,7 +630,7 @@ app.delete('/JobRoles/:jobID', async (req, res) => {
     try {
         const jobID = req.params.jobID;
 
-        const query = 'DELETE FROM JobRoles WHERE jobID = ?';
+        const query = 'CALL sp_delete_jobRole(?)';
         const [result] = await db.query(query, [jobID]);
 
         if (result.affectedRows === 0) {
@@ -607,7 +651,7 @@ app.delete('/Employees/:employeeID', async (req, res) => {
     try {
         const employeeID = req.params.employeeID;
 
-        const query = 'DELETE FROM Employees WHERE employeeID = ?';
+        const query = 'CALL sp_delete_employee(?)';
         const [result] = await db.query(query, [employeeID]);
 
         if (result.affectedRows === 0) {
@@ -628,7 +672,7 @@ app.delete('/Products/:productID', async (req, res) => {
     try {
         const productID = req.params.productID;
 
-        const query = 'DELETE FROM Products WHERE productID = ?';
+        const query = 'CALL sp_delete_product(?)';
         const [result] = await db.query(query, [productID]);
 
         if (result.affectedRows === 0) {
@@ -649,7 +693,7 @@ app.delete('/Orders/:orderID', async (req, res) => {
     try {
         const orderID = req.params.orderID;
 
-        const query = 'DELETE FROM Orders WHERE orderID = ?';
+        const query = 'CALL sp_delete_order(?);';
         const [result] = await db.query(query, [orderID]);
 
         if (result.affectedRows === 0) {
@@ -670,7 +714,7 @@ app.delete('/OrderItems/:orderID/:productID', async (req, res) => {
     try {
         const {orderID, productID} = req.params;
 
-        const query = 'DELETE FROM OrderItems WHERE orderID = ? AND productID = ?';
+        const query = 'CALL sp_delete_orderItem(?, ?)';
         const [result] = await db.query(query, [orderID, productID]);
 
         if (result.affectedRows === 0) {
@@ -685,9 +729,28 @@ app.delete('/OrderItems/:orderID/:productID', async (req, res) => {
     }
 });
 
+// Reset Route
+app.post('/Reset', async (req, res) => {
+    console.log("success in calling")
+    try {
+        await db.query("CALL sp_reset_database;");
+        
+
+        res.status(200).json({ message: "All data has been reset!"});
+    } catch (error) {
+        console.error("Error resetting:", error);
+        res.status(500).send("An error occurred while resetting the database.");
+    }
+});
+
 // ########################################
 // ########## LISTENER
 
 app.listen(PORT, function () {
     console.log('Express started on http://classwork.engr.oregonstate.edu:' + PORT + '; press Ctrl-C to terminate.');
 });
+
+//Citation
+//Date:2/11/26
+//Based on:
+// https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419

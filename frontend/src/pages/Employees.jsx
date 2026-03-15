@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
-import CreateCustomerForm from '../components/CreateCustomerForm';
-import UpdateCustomerForm from '../components/UpdateCustomerForm';
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 
 function Employees({ backendURL }) {
-    //Setting up class to hand to form
+    //Setting up class to hand to update/create forms
     const employeeConfig = {
         entityName: "Employees",
         idField: "employeeID",
@@ -14,12 +14,12 @@ function Employees({ backendURL }) {
             { name: "firstName", label: "First Name", type: "text" },
             { name: "lastName", label: "Last Name", type: "text" },
             { name: "startDate", label: "Start Date", type: "date" },
-            { name: 'jobRole', label: 'Job Role', type:'number'}
+            { name: 'jobID', label: 'Job Role', type:'number'}
         ]
     };
-    // Set up a state variable `employees` to store and display the backend response
+    
     const [employees, setemployees] = useState([]);
-
+    const [updateID, setUpdateID] = useState("");
 
     const getData = async function () {
         try {
@@ -35,7 +35,7 @@ function Employees({ backendURL }) {
             
             
         } catch (error) {
-          // If the API call fails, print the error to the console
+          
           console.log(error);
         }
 
@@ -61,18 +61,54 @@ function Employees({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {employees.map((employee, index) => (
-                        <TableRow key={index} rowObject={employee} backendURL={backendURL} refreshemployees={getData}/>
+                    {employees.map((employee) => (
+                        <TableRow 
+                            key={employee["Employee ID"]} 
+                            rowObject={employee} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Employees" 
+                            primaryKey={["Employee ID"]}
+                        />
                     ))}
 
                 </tbody>
             </table>
+
+            <p>If an employee is in the orders table, you will not be able to delete them!</p>
             <DynamicCreateForm
                 config={employeeConfig}
                 backendURL={backendURL}
                 refreshData={getData}
             />
-                        
+
+            <h2>Update Employee</h2>
+            <div>
+                <label>Employee ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Employee</option>
+                    {employees.map((employee) => (
+                        <option key={employee["Employee ID"]} value={employee["Employee ID"]}>
+                            {employee["Employee ID"]} - {employee["First Name"]} {employee["Last Name"]}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
+                config={employeeConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+                primaryKey={["employeeID"]}
+            />
+
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Employees" 
+            />         
         </>
     );
 

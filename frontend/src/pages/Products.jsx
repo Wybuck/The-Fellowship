@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
 import TableRow from '../components/TableRow';
-import CreateCustomerForm from '../components/CreateCustomerForm';
-import UpdateCustomerForm from '../components/UpdateCustomerForm';
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import ResetForm from "../components/ResetForm"
 
 function Products({ backendURL }) {
     //
@@ -11,13 +11,14 @@ function Products({ backendURL }) {
         fields: [
             { name: "productName", label: "Product Name", type: "text" },
             { name: "productPrice", label: "Price", type: "number" },
-            { name: "sale", label: "Sale", type: "number"}
+            { name: "sale", label: "Sale", type: "number"},
+            { name: "categoryName", label: "Category", type: "text"}
         ]     
     };
 
     // Set up a state variable `products` to store and display the backend response
     const [products, setcustomers] = useState([]);
-
+    const [updateID, setUpdateID] = useState("");
     
 
     const getData = async function () {
@@ -30,7 +31,7 @@ function Products({ backendURL }) {
     
             // Update the products state with the response data
             setcustomers(products);
-            setHomeworlds(homeworlds);
+            
             
         } catch (error) {
           // If the API call fails, print the error to the console
@@ -59,8 +60,15 @@ function Products({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {products.map((product, index) => (
-                        <TableRow key={index} rowObject={product} backendURL={backendURL} refreshcustomers={getData}/>
+                    {products.map((product) => (
+                        <TableRow 
+                            key={product["Product ID"]} 
+                            rowObject={product} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Products" 
+                            primaryKey={["Product ID"]}
+                        />
                     ))}
 
                 </tbody>
@@ -70,7 +78,33 @@ function Products({ backendURL }) {
                 backendURL={backendURL}
                 refreshData={getData}
             />
-                         
+
+            <h2>Update Product</h2>
+            <div>
+                <label>Product ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Product</option>
+                    {products.map((product) => (
+                        <option key={product["Product ID"]} value={product["Product ID"]}>
+                            {product["Product ID"]} - {product["Product Name"]}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
+                config={productConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+                primaryKey={["productID"]}
+            />   
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Products" 
+            />      
         </>
     );
 

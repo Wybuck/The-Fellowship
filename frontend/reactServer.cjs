@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 app.use(express.static(path.join(__dirname, 'dist')));
 
-const PORT = 33019;
+const PORT = 33022;
 
 // ########################################
 // ########## ROUTE HANDLERS
@@ -23,3 +23,8 @@ app.get('/*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running: http://classwork.engr.oregonstate.edu:${PORT}...`);
 });
+
+//Citation
+//Date:2/11/26
+//Based on:
+// https://canvas.oregonstate.edu/courses/2031764/pages/exploration-web-application-technology-2?module_item_id=26243419

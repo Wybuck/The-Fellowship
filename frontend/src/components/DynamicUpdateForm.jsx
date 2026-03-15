@@ -1,26 +1,55 @@
 import { useState, useEffect } from "react";
 
 const DynamicUpdateForm = ({
+  id,
   config,
-  data,
   backendURL,
-  refreshData
+  refreshData,
+  primaryKey
 }) => {
-  const [selectedId, setSelectedId] = useState("");
   const [formData, setFormData] = useState({});
 
-  // When user selects an item, auto-fill form
-  useEffect(() => {
-    if (!selectedId) return;
+  // Build URL for single OR composite key
+  const buildURL = () => {
+    if (!id) return "";
 
-    const selectedItem = data.find(
-      (item) => item[config.idField] == selectedId
-    );
+    // Composite key (id must be object)
+    if (primaryKey && primaryKey.length > 1) {
+      if (typeof id !== "object") {
+        console.error("Composite key requires id to be an object");
+        return "";
+      }
 
-    if (selectedItem) {
-      setFormData(selectedItem);
+      const keyPath = primaryKey.map((key) => id[key]).join("/");
+      return `${backendURL}/${config.entityName}/${keyPath}`;
     }
-  }, [selectedId, data, config.idField]);
+
+    // Single key
+    return `${backendURL}/${config.entityName}/${id}`;
+  };
+
+  // Fetch existing record to prefill form
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(buildURL());
+        const data = await response.json();
+
+        const mappedData = {};
+        config.fields.forEach((field) => {
+          mappedData[field.name] = data[field.name] ?? "";
+        });
+
+        setFormData(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch record:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleChange = (e) => {
     setFormData({
@@ -32,54 +61,47 @@ const DynamicUpdateForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await fetch(`${backendURL}/${config.entityName}/${selectedId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+    try {
+      await fetch(buildURL(), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-    refreshData();
-    setSelectedId("");
+      refreshData();
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
+
+  if (!id) return null;
 
   return (
     <form onSubmit={handleSubmit}>
       <h2>Update {config.entityName}</h2>
 
-      {/* Dropdown */}
-      <label>Select Record: </label>
-      <select
-        value={selectedId}
-        onChange={(e) => setSelectedId(e.target.value)}
-      >
-        <option value="">Select one</option>
-        {data.map((item) => (
-          <option
-            key={item[config.idField]}
-            value={item[config.idField]}
-          >
-            {config.displayField(item)}
-          </option>
-        ))}
-      </select>
+      {config.fields.map((field) => (
+        <div key={field.name}>
+          <label>{field.label}: </label>
+          <input
+            type={field.type}
+            name={field.name}
+            value={formData[field.name] || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      ))}
 
-      {/* Dynamic Fields */}
-      {selectedId &&
-        config.fields.map((field) => (
-          <div key={field.name}>
-            <label>{field.label}: </label>
-            <input
-              type={field.type}
-              name={field.name}
-              value={formData[field.name] || ""}
-              onChange={handleChange}
-            />
-          </div>
-        ))}
-
-      {selectedId && <button type="submit">Update</button>}
+      <button type="submit">Update</button>
     </form>
   );
 };
 
 export default DynamicUpdateForm;
+
+//Citation for AI use of tools
+//Date: 2/18/26
+// A brief description of prompts: I asked for an updated version of the DynamicCreateForm that would instead update a row and could potentially use a composite key to properly update.
+// This was a long chain of prompts, as i was trying to understand why it was making the changes it made and it led to a deeper understanding of JavaScript objects.
+//AI Source URL: https://chatgpt.com/

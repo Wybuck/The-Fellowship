@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';  // Importing useState for managing state in the component
+import { useState, useEffect } from 'react';  
 import TableRow from '../components/TableRow';
 
-import UpdateCustomerForm from "../components/UpdateCustomerForm";
+
 import DynamicCreateForm from "../components/DynamicCreateForm";
+import DynamicUpdateForm from "../components/DynamicUpdateForm";
+import ResetForm from "../components/ResetForm"
+
 
 function Customers({ backendURL }) {
 
-    // Set up a state variable `customers` to store and display the backend response
+    
     const [customers, setcustomers] = useState([]);
-
-    console.log(backendURL);
+    const [updateID, setUpdateID] = useState("");
+    
 
     const customerCreateConfig = {
         entityName: "Customers",
@@ -20,15 +23,7 @@ function Customers({ backendURL }) {
         ]
     };
     //Customer update
-    const customerUpdateConfig = {
-        entityName: "Customers",
-        idField: "customerID",
-        fields: [
-            { name: "firstName", label: "First Name", type: "text" },
-            { name: "lastName", label: "Last Name", type: "text" },
-            { name: "homeTown", label: "Home Town", type: "text" }
-        ]
-    };
+    
 
 
     const getData = async function () {
@@ -38,13 +33,14 @@ function Customers({ backendURL }) {
             
             // Convert the response into JSON format
             const {customers} = await response.json();
+            
     
             // Update the customers state with the response data
             setcustomers(customers);
             
             
         } catch (error) {
-          // If the API call fails, print the error to the console
+          
           console.log(error);
         }
 
@@ -55,6 +51,8 @@ function Customers({ backendURL }) {
         getData();
     }, []);
 
+
+    
     return (
         <>
             <h1>Customers</h1>
@@ -70,23 +68,57 @@ function Customers({ backendURL }) {
                 </thead>
 
                 <tbody>
-                    {customers.map((customer, index) => (
-                        <TableRow key={index} rowObject={customer} backendURL={backendURL} refreshcustomers={getData}/>
+                    {customers.map((customer) => (
+                        <TableRow 
+                            key={customer["Customer ID"]} 
+                            rowObject={customer} 
+                            backendURL={backendURL} 
+                            refreshData={getData} 
+                            entityName="Customers" 
+                            primaryKey={["Customer ID"]}
+                        />
                     ))}
 
                 </tbody>
             </table>
+
+            <p>Be careful Deleting here, it can be dangerous, and lead to other pages being effected! (Orders)</p>
 
             <DynamicCreateForm
                 config={customerCreateConfig}
                 backendURL={backendURL}
                 refreshData={getData}
             />
-
             
+            <h2>Update Customer</h2>
+            <div>
+                <label>Customer ID: </label>
+                <select value={updateID} onChange={(e) => setUpdateID(e.target.value)}>
+                    <option value="">Select Customer</option>
+                    {customers.map((customer) => (
+                        <option key={customer["Customer ID"]} value={customer["Customer ID"]}>
+                            {customer["Customer ID"]} - {customer["First Name"]} {customer["Last Name"]}
+                        </option>
+                    ))}
+                </select>
+            </div> 
+            <DynamicUpdateForm
+                id={updateID}
+                config={customerCreateConfig}
+                backendURL={backendURL}
+                refreshData={getData}
+                primaryKey={["customerID"]}
+            />
 
-            
-            <UpdateCustomerForm customers={customers} backendURL={backendURL} refreshcustomers={getData} />               
+            <br/>
+            <br/>
+            <ResetForm 
+                backendURL={backendURL}
+                refreshData={getData}
+                entityName="Customers" 
+            />     
+
+                    
         </>
     );
 
