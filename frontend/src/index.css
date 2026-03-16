@@ -1,4 +1,7 @@
-body { background-color: #556B2F; }
+body, #root { 
+    background-color: #556B2F;
+    min-height: 100vh;           
+}
 h1, h2 { margin-left: 16px;}
 table {border-collapse: collapse; margin-left: auto; margin-right: auto;}
 th, td {
