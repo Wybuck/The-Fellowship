@@ -6,7 +6,7 @@ th, td {
     text-align: center;
 }
 th {background-color: #646464;}
-tr:nth-child(even) {background-color: #556B2F;}
+tr:nth-child(even) {background-color: #8d8d8d;}
 .cuForm { margin-left: 32px;}
 input, select { margin-bottom: 4px;margin-right: 12px;}
 nav {background-color: #dfdada;padding: 16px;}
