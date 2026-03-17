@@ -4,7 +4,7 @@
 
 -- get all customer info
 
-select * from Customers;
+SELECT customerID AS "Customer ID", firstName AS "First Name", lastName AS "Last Name", homeTown AS "Home Town" from Customers;
 
 -- add customer
 
@@ -27,7 +27,7 @@ where customerID = @customerIDInput;
 
 -- get all job role info
 
-select * from JobRoles;
+SELECT j.jobID AS "Job ID", j.jobName AS "Job Name", j.pay as "Salary" from JobRoles j;
 
 -- add jobRole
 
@@ -49,7 +49,7 @@ where jobID = @jobIDInput;
 
 -- get all employee info
 
-select * from Employees;
+SELECT e.employeeID AS "Employee ID", e.firstName AS "First Name", e.lastName AS "Last Name", e.startDate AS "Start Date", e.jobID AS "Role ID", j.jobName AS "Role" FROM Employees e LEFT JOIN JobRoles j ON e.jobID = j.jobID;
 
 -- jobRole info retrieval 
 
@@ -78,7 +78,7 @@ where employeeID = @employeeIDInput;
 
 -- get all product info 
 
-select * from Products;
+SELECT productID as "Product ID", productName AS "Product Name", productPrice AS "Product Price", sale AS "Sale", categoryName as "Category" from Products;
 
 -- add product 
 
@@ -102,7 +102,7 @@ where productID = @productIDInput;
 
 -- get all order info
 
-select * from Orders;
+SELECT o.orderID as "Order ID", o.employeeID AS "Employee ID", e.firstName as "Employee Name", o.customerID AS "Customer ID", c.firstName AS "Customer Name", o.orderTotal AS "Order Total", o.orderDate AS "Order Date" from Orders o LEFT JOIN Employees e ON o.employeeID = e.employeeID LEFT JOIN Customers c on o.customerID = c.customerID;
 
 -- delete order
 
@@ -112,7 +112,7 @@ delete from Orders where orderID = @orderIDInput;
 
 -- get all orderitem info
 
-select * from OrderItems;
+SELECT o.orderID AS "Order ID", o.productID AS "Product ID", p.productName AS "Product Name", o.quantity AS "Quantity" from OrderItems o LEFT JOIN Products p ON o.productID = p.productID;
 
 -- add orderItems
 

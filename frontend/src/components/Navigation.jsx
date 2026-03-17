@@ -1,3 +1,5 @@
+
+
 function Navigation() {
     return (
         <nav>
@@ -9,6 +11,7 @@ function Navigation() {
             <a href="/Products">Products</a>
             <a href="/Orders">Orders</a>
             <a href="/OrderItems">Order Items</a>
+            
         </nav>
     )
 } export default Navigation;

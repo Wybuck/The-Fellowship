@@ -1,45 +1,40 @@
-import { useState } from "react";
+const DeleteEntityForm = ({ rowObject, backendURL, refreshData, primaryKey, entityName }) => {
 
-const DynamicForm = ({ config, backendURL, refreshData }) => {
-  const [formData, setFormData] = useState({});
+    const handleDelete = async (e) => {
+        e.preventDefault();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+        try {
+            // Build URL using route params for composite keys
+            let deleteURL = `${backendURL}/${entityName}`;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+            if (Array.isArray(primaryKey)) {
+                // join the values in the order of primaryKey array
+                const keyValues = primaryKey.map(key => rowObject[key]).join("/");
+                deleteURL += `/${keyValues}`;
+            } else {
+                deleteURL += `/${rowObject[primaryKey]}`;
+            }
 
-    await fetch(`${backendURL}/${config.entityName}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+            const response = await fetch(deleteURL, { method: "DELETE" });
 
-    refreshData();
-  };
+            if (!response.ok) {
+                throw new Error(`Failed to delete: ${response.status}`);
+            }
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create {config.entityName}</h2>
+            refreshData();
+        } catch (error) {
+            console.log("Delete failed:", error);
+        }
+    };
 
-      {config.fields.map((field) => (
-        <div key={field.name}>
-          <label>{field.label}: </label>
-          <input
-            type={field.type}
-            name={field.name}
-            onChange={handleChange} required
-          />
-        </div>
-      ))}
-
-      <button type="submit">Submit</button>
-    </form>
-  );
+    return (
+        <td>
+            <form onSubmit={handleDelete}>
+                <button class='delete' type="submit">Delete</button>
+            </form>
+        </td>
+    );
 };
 
-export default DynamicForm;
+export default DeleteEntityForm;
+

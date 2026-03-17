@@ -1,12 +1,15 @@
 --Group 16, Wyatt Buckman, Jackson Manriquez
 
+SET FOREIGN_KEY_CHECKS=0;
+
 DROP TABLE IF EXISTS Customers, JobRoles, Employees, Products, Orders, OrderItems;
 
+SET FOREIGN_KEY_CHECKS=1;
 --------------------------------
 --Create table section
 --------------------------------
 
-CREATE OR REPLACE TABLE Customers (
+CREATE TABLE Customers (
   customerID int NOT NULL AUTO_INCREMENT,
   firstName VARCHAR(45) NOT NULL,
   lastName VARCHAR(45) NOT NULL,
@@ -14,14 +17,14 @@ CREATE OR REPLACE TABLE Customers (
   PRIMARY KEY (customerID)
 ) ENGINE=InnoDB;
 --Must Bring in Job Roles before Employees, as is referenced in employees. 
-CREATE OR REPLACE TABLE JobRoles (
+CREATE TABLE JobRoles (
   jobID int NOT NULL AUTO_INCREMENT,
   jobName VARCHAR(45) NOT NULL,
   pay int NOT NULL,
   PRIMARY KEY (jobID)
 ) ENGINE=InnoDB;
 
-CREATE OR REPLACE TABLE Employees (
+CREATE TABLE Employees (
   employeeID int NOT NULL AUTO_INCREMENT,
   firstName VARCHAR(45) NOT NULL,
   lastName VARCHAR(45) NOT NULL,
@@ -33,20 +36,20 @@ CREATE OR REPLACE TABLE Employees (
     ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
-CREATE OR REPLACE TABLE Products (
+CREATE TABLE Products (
   productID int NOT NULL AUTO_INCREMENT, 
   productName VARCHAR(45) NOT NULL, 
-  productPrice decimal NOT NULL,
+  productPrice decimal(10, 2) NOT NULL,
   sale int,
   categoryName VARCHAR(45) NOT NULL,
   PRIMARY KEY (productID)
 ) ENGINE=InnoDB;
 -- Can finally create Orders table
-CREATE OR REPLACE TABLE Orders (
+CREATE TABLE Orders (
   orderID int NOT NULL AUTO_INCREMENT, 
   employeeID int NOT NULL,
   customerID int NOT NULL,
-  orderTotal decimal NOT NULL DEFAULT 0,
+  orderTotal decimal(10, 2) NOT NULL DEFAULT 0,
   orderDate date NOT NULL,
   PRIMARY KEY (orderID),
   FOREIGN KEY (employeeID) 
@@ -57,7 +60,7 @@ CREATE OR REPLACE TABLE Orders (
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
   
-CREATE OR REPLACE TABLE OrderItems (
+CREATE TABLE OrderItems (
   orderID int NOT NULL,
   productID int NOT NULL,
   quantity int NOT NULL,
@@ -139,7 +142,7 @@ INSERT INTO OrderItems (orderID, productID, quantity) VALUES
          AND employeeID = (SELECT employeeID FROM Employees WHERE firstName='Bilbo' AND lastName='Baggins')
          AND orderDate = '3003-01-01'),
     (SELECT productID FROM Products WHERE productName='Beer'),
-    5
+    8
   ),
   (
     (SELECT orderID FROM Orders 

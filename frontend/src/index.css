@@ -1,18 +1,33 @@
-body, #root { 
-    background-color: #556B2F;
-    min-height: 100vh;           
+* {
+    margin: 0;
+    padding: 0; 
+    box-sizing: border-box;
 }
-h1, h2 { margin-left: 16px;}
-table {border-collapse: collapse; margin-left: auto; margin-right: auto;}
+
+h1, h2 { margin-left: 16px; color: beige;}
+table {border-collapse: collapse; margin-left: auto; margin-right: auto; border-radius: 8px;}
 th, td {
     border: 1px solid #646464;
     padding: 12px;
     text-align: center;
 }
-th {background-color: #646464;}
-tr:nth-child(even) {background-color: #8d8d8d;}
+body {background-color: #556B2F; padding-top: 30px;}
+th {background-color: #8B4513;}
+tr:nth-child(even) {color: gold;background-color: #b4632a;}
+tr:nth-child(odd) {color: beige;background-color: #a1663c;}
 .cuForm { margin-left: 32px;}
 input, select { margin-bottom: 4px;margin-right: 12px;}
-nav {background-color: #dfdada;padding: 16px;}
-a {margin-left: 16px;}
-.homepageDescription {margin-left: 32px;}
+nav {background-color: #8B4513; padding : 16px; color: #FFD700; position: fixed; 
+    top: 0px; left: 0px;border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; 
+    width: 100%; box-sizing: border-box;}
+a:hover{ color:beige; }
+a {margin-left: 16px; color: #FFD700; text-decoration: none;}
+.homepageDescription {margin-left: 32px; text-decoration: none;}
+label {color: beige;}
+button {color: beige; background-color: saddlebrown; border-radius: 8px; padding: 6px;}
+input{color: beige; background-color: saddlebrown; border-radius: 8px;}
+select{color: beige; background-color: saddlebrown; border-radius: 8px;}
+p{color: beige;}
+footer{color: saddlebrown; position: absolute; bottom: 0px; background-color: beige; padding: 16px; width: 100%}
+
+
